@@ -32,7 +32,7 @@ def table_exists(conn, table_name):
                 SELECT 
                     *
                 FROM
-                    postgres.tables
+                    information_schema.tables
                 WHERE
                     table_name=%(table_name)s
             )
@@ -66,6 +66,7 @@ if __name__ == "__main__":
     conn = psycopg2.connect(
         os.environ.get("DATABASE_URL", "postgres://postgres:postgres@db:5432/postgres")
     )
+
     logging.debug("connected to database")
 
     create_tables_if_not_exists(conn, default_user_db)
