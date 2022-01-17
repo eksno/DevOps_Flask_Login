@@ -10,17 +10,15 @@ networks:
 
 services:
   db_exporter:
-    container_name: db_exporter
     image:  quay.io/prometheuscommunity/postgres-exporter
     networks:
       - back-tier
     ports:
       - 9187:9187
     env_file:
-      - /env/db_exporter.env
+      - .env
 
   prometheus:
-    container_name: prometheus
     image: prom/prometheus:latest
     volumes:
       - ./prometheus/:/etc/prometheus/
@@ -39,7 +37,6 @@ services:
     restart: always
 
   alertmanager:
-    container_name: alertmanager
     image: prom/alertmanager
     ports:
       - 9093:9093
@@ -53,7 +50,6 @@ services:
       - '--storage.path=/alertmanager'
   
   grafana:
-    container_name: grafana
     image: grafana/grafana
     user: "472"
     depends_on:
@@ -71,19 +67,17 @@ services:
     restart: always
 
   db:
-    container_name: db
     image: postgres:13
     ports:
       - 5432:5432
     env_file:
-      - /env/db.env
+      - .env
     volumes:
       - ./data/db/:/app/data/db
     networks:
       - back-tier
 
   app:
-    container_name: app
     build: .
     entrypoint: >
       sh -c "pip3 install -r requirements.txt &&
@@ -95,7 +89,7 @@ services:
     depends_on:
       - db
     env_file:
-      - /env/app.env
+      - .env
     networks:
       - back-tier
       - front-tier
