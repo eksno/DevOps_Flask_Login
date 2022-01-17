@@ -18,6 +18,7 @@ def home():
     logging.info("/ or /home loaded")
     return render_template("home.html")
 
+
 @app.route("/metrics")
 def metrics():
     return generate_latest()

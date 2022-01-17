@@ -37,7 +37,7 @@ def table_exists(conn, table_name):
                     table_name=%(table_name)s
             )
         """,
-        {"table_name": table_name}
+        {"table_name": table_name},
     )
     result = cur.fetchone()[0]
 
@@ -55,9 +55,13 @@ def create_tables_if_not_exists(conn, db_dict):
             create_table(conn, table_dict)
 
 
-
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filename="app.log", filemode="w")
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        filename="app.log",
+        filemode="w",
+    )
 
     conn = psycopg2.connect(
         os.environ.get("DATABASE_URL", "postgres://postgres:postgres@db:5432/postgres")
