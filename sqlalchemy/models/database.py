@@ -22,22 +22,19 @@ class User(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     email = sa.Column(sa.UnicodeText(), nullable=False, index=True, unique=True)
     username = sa.Column("username", sa.UnicodeText(), nullable=False)
-    password = sa.relationship("Password", back_populates="user")
+    password = sa.relationship("Password", backref="user")
+    user_token = sa.relationship("UserToken", backref="user")
 
 
 class Password(Base):
     __tablename__ = 'passwords'
 
-    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-    user = sa.relationship("User", back_populates="password")
-    password = sa.Column(sa.UnicodeText(), nullable=True)
+    user = sa.relationship("User", backref="password")
+    password = sa.Column(sa.UnicodeText(), nullable=False)
 
 
 class UserToken(Base):
-    __tablename__ = 'usertokens'
+    __tablename__ = 'user_tokens'
 
-    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-    user = sa.relationship("User", back_populates="usertokens")
-    user_token = sa.Column(sa.UnicodeText(), nullable=True)
-
-#user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), ondelete='CASCADE')
+    user = sa.relationship("User", backref="user_tokens")
+    user_token = sa.Column(sa.UnicodeText(), nullable=False)
