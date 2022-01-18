@@ -80,8 +80,7 @@ services:
   app:
     build: .
     entrypoint: >
-      sh -c "pip3 install -r requirements.txt &&
-             python3 run.py"
+      bash -c "./scripts/app-setup.sh"
     volumes:
       - .:/app
     ports:
