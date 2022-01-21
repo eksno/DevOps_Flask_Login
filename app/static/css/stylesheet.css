@@ -1,0 +1,145 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+
+.form-page {
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.form-page h1 {
+  font-family: "Roboto", sans-serif;
+  text-align: center;
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #FFFFFF;
+}
+.form {
+  position: relative;
+  z-index: 1;
+  background: #303030;
+  max-width: 360px;
+  margin: auto auto auto;
+  padding: 45px 45px 30px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #424242;
+  color: #FFFFFF;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #BB86FC;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  color: #000000;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover,.form button:active,.form button:focus {
+  background: #c99dff;
+}
+.form .message {
+  margin: 0 0 15px;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.form .message a {
+  color: #BB86FC;
+  text-decoration: none;
+}
+.container {
+  text-align: center;
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.container h1 {
+  font-family: "Roboto", sans-serif;
+  text-align: center;
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #FFFFFF;
+}
+.container:before, .container:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.container .info {
+  position: relative;
+  z-index: 1;
+  background: #303030;
+  max-width: 360px;
+  margin: auto auto auto;
+  padding: 45px 45px 45px;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.container .info h1 {
+  font-family: "Roboto", sans-serif;
+  text-align: center;
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #FFFFFF;
+}
+.container button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #BB86FC;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  color: #000000;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.container button:hover,.container button:active,.container button:focus {
+  background: #c99dff;
+}
+.container .info span {
+  color: #4d4d4d;
+  font-size: 12px;
+  margin: 0 0 15px
+}
+.container .info span a {
+  color: #000000;
+  text-decoration: none;
+}
+.container .info span .fa {
+  color: #CF6679;
+}
+body {
+  background: #212121; /* fallback for old browsers */
+  /*
+  background: -webkit-linear-gradient(right, #212121, #212121);
+  background: -moz-linear-gradient(right, #212121, #212121);
+  background: -o-linear-gradient(right, #212121, #212121);
+  background: linear-gradient(to left, #212121, #212121);
+  */
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;      
+}

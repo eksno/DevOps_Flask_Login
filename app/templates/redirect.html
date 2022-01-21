@@ -3,18 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Refresh" content="0; url='{{ url }}'" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API - Home</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
 </head>
 
 <body>
-    <div class="form-page">
-        <h1>{{ userdata }}</h1>
-        <div class="form">
-        </div>
-    </div>
+    <p>Please follow <a href="{{ url }}">this link</a>.</p>
 </body>
 
 </html>

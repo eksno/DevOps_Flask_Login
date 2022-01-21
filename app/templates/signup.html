@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+</head>
+
+<body>
+    <div class="form-page">
+        <h1>Sign Up</h1>
+        <div class="form">
+            <form class="signup-form" action="/signup" method="POST">
+                <input type="text" name="Username" placeholder="Username" />
+                <input type="text" name="E-Mail" placeholder="E-Mail" />
+                <input type="password" name="Password" placeholder="Password" />
+
+                <button type="submit">Sign Up</button>
+
+                <p class="message">Already registered? <a href="/signin">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
