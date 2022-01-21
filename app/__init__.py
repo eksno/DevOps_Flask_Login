@@ -2,7 +2,8 @@ import os
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 def get_connection_url() -> str:
@@ -22,6 +23,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_url()
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
 
-sa = SQLAlchemy(app)
+engine = create_engine(get_connection_url())
+
+Session = sessionmaker()
+Session.configure(bind=engine)
 
 from app import views

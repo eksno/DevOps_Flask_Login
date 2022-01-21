@@ -4,4 +4,3 @@ black
 psycopg2-binary
 prometheus_client
 alembic
-Flask-SQLAlchemy

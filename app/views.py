@@ -1,12 +1,13 @@
-from multiprocessing.spawn import import_main_path
-from app import app
 from flask import render_template, request, jsonify
 from prometheus_client import generate_latest, Counter, Summary
-
 
 import os
 import logging
 import psycopg2
+
+from app import app, Session
+
+import orm.database as orm
 
 view_metric = Counter("view", "Endpoint View", ["endpoint"])
 load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
@@ -42,6 +43,7 @@ def signin():
         userdata = request.form
 
         if len(userdata) == 2:
+            
             conn = psycopg2.connect(
                 os.environ.get("DATABASE_URL", "postgres://postgres:postgres@db:5432/postgres")
             )
@@ -87,57 +89,28 @@ def signup():
     if request.method == 'POST':
         userdata = request.form
 
-        if len(userdata) == 3:
-            conn = psycopg2.connect(get_connection_url())
-            logging.debug("connected to database")
-            
-            with conn.cursor() as cur:
-                logging.debug("opened cursor")
-
-                # Insert data into users table
-                cur.execute(
-                    """
-                    INSERT INTO users (
-                        email,
-                        username
-                    )
-                    VALUES
-                        (
-                            email = %(email)s,
-                            username = %(username)s
-                        );
-                    """,
-                    {
-                        "email": userdata["E-Mail"],
-                        "username": userdata["Username"]
-                    },
-                )
-
-                # Insert data into passwords table
-                encrypted_password = "testing123"
-                cur.execute(
-                    """
-                    INSERT INTO passwords (
-                        password
-                    )
-                    VALUES
-                        (
-                            password = %(encrypted_password)
-                        );
-                    """,
-                    {
-                        "passwords": encrypted_password
-                    },
-                )
-
-            logging.debug("exited cursor")
-
-            # TODO: actually sign in.
-
-            return render_template("redirect.html", url="/home")
-        else:
-            # Data is bad, return error
+        #TODO: Add more bad data checks
+        if len(userdata) != 3:
             return render_template("error.html", message="Bad Data")
+
+        #TODO: check if userdata is valid
+
+        # Add user
+        logging.debug("creating database session")
+        with Session() as session:
+            logging.debug("session created")
+            
+            encrypted_password = "testing123"
+            user_token = "123testing"
+
+            new_user = orm.User(email=userdata["E-Mail"], username=userdata["Username"])
+            new_password = orm.Password(password=encrypted_password)
+            new_user_token = orm.UserToken(user_token=user_token)
+
+        # TODO: actually sign in.
+
+        return render_template("redirect.html", url="/home")
+
     
     # Default operation
     return render_template("signup.html")
