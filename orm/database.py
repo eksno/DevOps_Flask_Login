@@ -22,9 +22,6 @@ class User(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     email = sa.Column(sa.UnicodeText(), nullable=False, index=True, unique=True)
     username = sa.Column("username", sa.UnicodeText(), nullable=False)
-    
-    password = sa.orm.relationship("Password", backref="user")
-    user_token = sa.orm.relationship("UserToken", backref="user")
 
     def __repr__(self):
         return '<User %r>' % self.email
