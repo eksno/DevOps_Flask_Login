@@ -17,35 +17,35 @@ Base = declarative_base(metadata=meta)
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     email = sa.Column(sa.UnicodeText(), nullable=False, index=True, unique=True)
     username = sa.Column("username", sa.UnicodeText(), nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.email
+        return "<User %r>" % self.email
 
 
 class Password(Base):
-    __tablename__ = 'passwords'
+    __tablename__ = "passwords"
 
-    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), primary_key=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), primary_key=True)
     password = sa.Column(sa.UnicodeText(), nullable=False)
 
     user = sa.orm.relationship("User", backref="password")
-    
+
     def __repr__(self):
-        return '<Password %r>' % self.password
+        return "<Password %r>" % self.password
 
 
 class UserToken(Base):
-    __tablename__ = 'user_tokens'
+    __tablename__ = "user_tokens"
 
-    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), primary_key=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), primary_key=True)
     user_token = sa.Column(sa.UnicodeText(), nullable=False)
 
     user = sa.orm.relationship("User", backref="user_tokens")
 
     def __repr__(self):
-        return '<UserToken %r>' % self.user_token
+        return "<UserToken %r>" % self.user_token
