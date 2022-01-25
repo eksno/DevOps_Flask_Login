@@ -1,6 +1,7 @@
-from logging import handlers
 import os
+import errno
 import logging
+
 from logging.handlers import TimedRotatingFileHandler
 from waitress import serve
 from datetime import datetime
@@ -10,7 +11,6 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import errno
 
 
 def make_sure_path_exists(path):
