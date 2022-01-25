@@ -9,7 +9,7 @@ from flask.logging import default_handler
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 
 
@@ -31,7 +31,7 @@ log_dir = os.path.join(app_dir, "logs")
 def get_connection_url() -> str:
     """
     Get connection URL from environment variables
-    (see environment variables set in docker-compose)
+    (see environment variables referenced in docker-compose)
     """
     postgres_user = os.environ["POSTGRES_USER"]
     postgres_pass = os.environ["POSTGRES_PASS"]
@@ -117,9 +117,9 @@ def create_app():
 
 
 app = create_app()
-logging.debug("test debug")
 
 engine = create_engine(get_connection_url())
+insp = inspect(engine)
 
 Session = sessionmaker()
 Session.configure(bind=engine)
