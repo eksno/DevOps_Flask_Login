@@ -6,7 +6,7 @@ import sqlalchemy as sa
 
 from app import app, Session, insp
 
-import orm.database as orm
+import app.orm.database as orm
 
 view_metric = Counter("view", "Endpoint View", ["endpoint"])
 load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
@@ -40,27 +40,31 @@ def signin():
             # Data is bad, return error
             return render_template("error.html", message="Bad Data")
 
-
         app.logger.debug("checking " + userdata["E-Mail"])
 
         app.logger.debug("creating and beginning database session...")
         with Session.begin() as session:
             app.logger.debug("session created and started")
-            exists = session.query(orm.User).filter(orm.User.email==userdata["E-Mail"]).scalar()
+            exists = (
+                session.query(orm.User)
+                .filter(orm.User.email == userdata["E-Mail"])
+                .scalar()
+            )
         app.logger.debug("session closed")
 
         if not exists:
             app.logger.debug(userdata["E-Mail"] + " does not exist.")
             # User does not exist
-            return render_template("signin.html", message="User does not exist.")  # TODO: Give a better message telling the person the user already exists
-        
+            return render_template(
+                "signin.html", message="User does not exist."
+            )  # TODO: Give a better message telling the person the user already exists
+
         # User exists
         app.logger.debug(userdata["E-Mail"] + " does exist, logging in...")
 
         # TODO: check password and properly login
 
         return render_template("redirect.html", url="/home")
-            
 
     app.logger.debug("default operation")
     # Default operation
@@ -75,7 +79,7 @@ def signup():
     if request.method == "POST":
         app.logger.debug("request method POST")
         userdata = request.form
-        
+
         app.logger.debug(userdata["E-Mail"] + " creating new user...")
 
         # TODO: Add more bad data checks
@@ -97,9 +101,13 @@ def signup():
         with Session.begin() as session:
             app.logger.debug("session created and started")
 
-            if session.query(orm.User).filter(orm.User.email==userdata["E-Mail"]).scalar():
+            if (
+                session.query(orm.User)
+                .filter(orm.User.email == userdata["E-Mail"])
+                .scalar()
+            ):
                 app.logger.debug(userdata["E-Mail"] + " already exists...")
-                return("signup.html")  # TODO: Give some message telling the person the user already exists
+                return "signup.html"  # TODO: Give some message telling the person the user already exists
 
             session.add(new_user)
             session.add(new_password)
