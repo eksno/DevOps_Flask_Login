@@ -6,7 +6,7 @@ import sqlalchemy as sa
 
 from app import app, Session, insp
 
-import lib.orm as orm
+from resources import orm
 
 view_metric = Counter("view", "Endpoint View", ["endpoint"])
 load_duration_metric = Summary("load_duration", "Time spent loading sql pages")

@@ -1,6 +1,5 @@
 import os
 import base64
-import hashlib
 import logging
 
 try:  # The crypto package depends on the library installed
