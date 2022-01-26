@@ -53,10 +53,26 @@ def create_handlers(log_fname):
     f_format = logging.Formatter(
         "[%(asctime)s] {%(pathname)s:%(lineno)d} %(name)s - %(levelname)s - %(message)s"
     )
+
+    # Apply formatter
     c_handler.setFormatter(c_format)
     f_handler.setFormatter(f_format)
 
     return c_handler, f_handler
+
+
+def create_handlers():
+    # Create handler
+    c_handler = logging.StreamHandler()
+    c_handler.setLevel(logging.DEBUG)
+
+    # Create formatter and add it to handler
+    c_format = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+
+    # Apply formatter
+    c_handler.setFormatter(c_format)
+
+    return c_handler
 
 
 def configure_logging(app):
