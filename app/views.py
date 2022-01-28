@@ -4,12 +4,15 @@ from prometheus_client import generate_latest, Counter, Summary
 import logging
 import sqlalchemy as sa
 
-from app import app, Session, insp
+from app import app, Session, engine, insp
 
 from resources import orm
+from resources.common import AESCipher
 
 view_metric = Counter("view", "Endpoint View", ["endpoint"])
 load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
+
+cipher = AESCipher()
 
 
 @app.route("/")
@@ -45,12 +48,32 @@ def signin():
         app.logger.debug("creating and beginning database session...")
         with Session.begin() as session:
             app.logger.debug("session created and started")
-            exists = (
+            user = (
                 session.query(orm.User)
                 .filter(orm.User.email == userdata["E-Mail"])
-                .scalar()
+                .all()
             )
+
+            exists = len(user) is not 0
+
+            if exists:
+                user = {
+                    "id": int(user[0].id),
+                    "email": str(user[0].email),
+                    "username": str(user[0].username),
+                }
+
+                encrypted_password = (
+                    session.query(orm.Password)
+                    .filter(orm.Password.user_id == user["id"])
+                    .all()
+                )
+
+                encrypted_password = str(encrypted_password[0].password)
+
         app.logger.debug("session closed")
+
+        app.logger.debug(exists)
 
         if not exists:
             app.logger.debug(userdata["E-Mail"] + " does not exist.")
@@ -60,11 +83,25 @@ def signin():
             )  # TODO: Give a better message telling the person the user already exists
 
         # User exists
-        app.logger.debug(userdata["E-Mail"] + " does exist, logging in...")
+        app.logger.debug(userdata["E-Mail"] + " does exist, signing in...")
+        app.logger.debug(
+            "User Data - ID: "
+            + str(user["id"])
+            + " | E-Mail: "
+            + user["email"]
+            + " | Username: "
+            + user["username"]
+        )
 
-        # TODO: check password and properly login
+        submitted_encrypted_password = cipher.encrypt(userdata["Password"])
+        if userdata["Password"] == cipher.decrypt(encrypted_password):
+            app.logger.debug("sign in successfull")
+            return render_template("signed_in.html", email=userdata["E-Mail"])
+        app.logger.debug("sign in unsuccessful")
 
-        return render_template("redirect.html", url="/home")
+        return render_template(
+            "signin.html", message="Wrong password or e-mail."
+        )  # TODO: Give a better message telling the person the user already exists
 
     app.logger.debug("default operation")
     # Default operation
@@ -90,8 +127,8 @@ def signup():
 
         # Add user
 
-        encrypted_password = "testing123"
-        user_token = "123testing"
+        encrypted_password = cipher.encrypt(userdata["Password"])
+        user_token = cipher.encrypt("123user_token")
 
         new_user = orm.User(email=userdata["E-Mail"], username=userdata["Username"])
         new_password = orm.Password(password=encrypted_password, user=new_user)
@@ -101,6 +138,7 @@ def signup():
         with Session.begin() as session:
             app.logger.debug("session created and started")
 
+            # Check if user exists
             if (
                 session.query(orm.User)
                 .filter(orm.User.email == userdata["E-Mail"])
@@ -109,6 +147,7 @@ def signup():
                 app.logger.debug(userdata["E-Mail"] + " already exists...")
                 return "signup.html"  # TODO: Give some message telling the person the user already exists
 
+            # Add user
             session.add(new_user)
             session.add(new_password)
             session.add(new_user_token)

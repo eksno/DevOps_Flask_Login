@@ -49,7 +49,7 @@ class AESCipher:
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
         decrypted = unpad(
             padded_data=cipher.decrypt(enc[AES.block_size :]), block_size=__BLOCK_SIZE__
-        ).decode('utf-8')
+        ).decode("utf-8")
         return decrypted
 
 

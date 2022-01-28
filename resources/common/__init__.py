@@ -1,2 +1,1 @@
-
-from cipher import *
+from .cipher import AESCipher

@@ -2,14 +2,14 @@ import os
 import errno
 import logging
 
-from logging.handlers import TimedRotatingFileHandler
+from resources.OpenLogger.open_logger import configure_loggers
 from waitress import serve
 from datetime import datetime
 from flask.logging import default_handler
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, sql
 from sqlalchemy.orm import sessionmaker
 
 
@@ -41,86 +41,15 @@ def get_connection_url() -> str:
     return f"postgresql://{postgres_user}:{postgres_pass}@{postgres_host}:{postgres_port}/{postgres_dbname}"
 
 
-def create_handlers(log_fname):
-    # Create handlers
-    c_handler = logging.StreamHandler()
-    f_handler = TimedRotatingFileHandler(log_fname)
-    c_handler.setLevel(logging.DEBUG)
-    f_handler.setLevel(logging.DEBUG)
-
-    # Create formatters and add it to handlers
-    c_format = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
-    f_format = logging.Formatter(
-        "[%(asctime)s] {%(pathname)s:%(lineno)d} %(name)s - %(levelname)s - %(message)s"
-    )
-
-    # Apply formatter
-    c_handler.setFormatter(c_format)
-    f_handler.setFormatter(f_format)
-
-    return c_handler, f_handler
-
-
-def create_handlers():
-    # Create handler
-    c_handler = logging.StreamHandler()
-    c_handler.setLevel(logging.DEBUG)
-
-    # Create formatter and add it to handler
-    c_format = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
-
-    # Apply formatter
-    c_handler.setFormatter(c_format)
-
-    return c_handler
-
-
-def configure_logging(app):
-    now = datetime.now()
-
-    # Get Loggers
+def configure_logging():
     app_logger = logging.getLogger(__name__)
     flask_logger = logging.getLogger("flask")
     sqlalchemy_logger = logging.getLogger("sqlalchemy")
     waitress_logger = logging.getLogger("waitress")
 
-    # Set root logger level:
-    # if (handler level < root level):
-    #     root level overrides handler level
-    app_logger.setLevel(logging.DEBUG)
-    flask_logger.setLevel(logging.DEBUG)
-    sqlalchemy_logger.setLevel(logging.DEBUG)
-    waitress_logger.setLevel(logging.DEBUG)
-
-    # Create Handlers
-    make_sure_path_exists(os.path.join(log_dir, now.strftime("%Y")))
-    log_year_dir = os.path.join(log_dir, now.strftime("%Y"))
-    make_sure_path_exists(os.path.join(log_year_dir, now.strftime("%B")))
-    log_month_dir = os.path.join(log_year_dir, now.strftime("%B"))
-    log_fname = os.path.join(
-        log_month_dir, "{}.log".format(now.strftime("%b-%d-%Y_%H-%M-%S"))
+    configure_loggers(
+        [app_logger, flask_logger, sqlalchemy_logger, waitress_logger], log_to_file=True
     )
-
-    c_handler, f_handler = create_handlers(log_fname)
-
-    # Add handlers to the logger
-    app_logger.addHandler(c_handler)
-    app_logger.addHandler(f_handler)
-    app_logger.addHandler(default_handler)
-
-    flask_logger.addHandler(c_handler)
-    flask_logger.addHandler(f_handler)
-
-    sqlalchemy_logger.addHandler(c_handler)
-    sqlalchemy_logger.addHandler(f_handler)
-
-    waitress_logger.addHandler(c_handler)
-    waitress_logger.addHandler(f_handler)
-
-    # app_logger, app.logger, and logging are all the same because they alle are based off __name__
-    # In other words, everything have done to app_logger here has synced up automatically with
-    # app.logger and logging.
-    logging.debug("logging configured")
 
 
 def create_app():
@@ -128,7 +57,7 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = get_connection_url()
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
 
-    configure_logging(app)
+    configure_logging()
     return app
 
 
