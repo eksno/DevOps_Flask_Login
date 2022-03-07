@@ -25,13 +25,13 @@ class User(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
     email = sa.Column(sa.UnicodeText(), nullable=False, index=True, unique=True)
     username = sa.Column("username", sa.UnicodeText(), nullable=False)
-    registered_on = sa.Column(sa.DateTime, nullable=False)
-    admin = sa.Column(sa.Boolean, nullable=False, default=False)
+    registered_on = sa.Column(sa.DateTime, nullable=True)
+    admin = sa.Column(sa.Boolean, nullable=True, default=True)
 
-    def __init__(self, email, password, admin=False) -> None:
+    def __init__(self, email, username, admin=False) -> None:
         self.email = email
-        self.password = password
-        self.registered_on = datetime.datetime.now()
+        self.username = username
+        self.registered_on = datetime.now()
         self.admin = admin
 
     def __repr__(self):

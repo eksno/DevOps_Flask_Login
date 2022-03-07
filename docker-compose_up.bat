@@ -12,7 +12,9 @@ echo.
 echo Running %myfolder% using docker_compose:
 
 echo - Running using docker_compose...
-docker-compose -f "docker-compose.yml" up
+set DOCKER_COMPOSE=%MYDIR%docker-compose.yml
+
+docker-compose -f %DOCKER_COMPOSE% up
 
 
 PAUSE
