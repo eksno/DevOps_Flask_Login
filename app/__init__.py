@@ -71,7 +71,7 @@ Session.configure(bind=engine)
 
 
 def serve_app(app):
-    serve(app, host="0.0.0.0", port=8080, url_scheme="https")
+    serve(app, host="0.0.0.0", port=os.environ["FLASK_PORT"], url_scheme="https")
 
 
 from app import views
