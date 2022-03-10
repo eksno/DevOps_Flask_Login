@@ -1,0 +1,31 @@
+[2022-03-09 08:09:18,730] {/app/app/views.py:114} app - INFO - /signup loaded
+[2022-03-09 08:09:28,089] {/app/app/views.py:114} app - INFO - /signup loaded
+[2022-03-09 08:09:28,090] {/app/app/views.py:117} app - DEBUG - request method POST
+[2022-03-09 08:09:28,090] {/app/app/views.py:120} app - DEBUG - thomas.fredriksen@oceandata.earth creating new user...
+[2022-03-09 08:09:28,120] {/app/app/views.py:137} app - DEBUG - creating and beginning database session...
+[2022-03-09 08:09:28,121] {/app/app/views.py:139} app - DEBUG - session created and started
+[2022-03-09 08:09:28,130] {/app/app/views.py:147} app - DEBUG - thomas.fredriksen@oceandata.earth already exists...
+[2022-03-09 08:09:37,083] {/app/app/views.py:32} app - INFO - /signin loaded
+[2022-03-09 08:09:37,083] {/app/app/views.py:106} app - DEBUG - default operation
+[2022-03-09 08:09:40,969] {/app/app/views.py:32} app - INFO - /signin loaded
+[2022-03-09 08:09:40,969] {/app/app/views.py:35} app - DEBUG - request method POST
+[2022-03-09 08:09:40,970] {/app/app/views.py:38} app - DEBUG - thomas.fredriksen@oceandata.earth login attempt...
+[2022-03-09 08:09:40,970] {/app/app/views.py:46} app - DEBUG - checking thomas.fredriksen@oceandata.earth
+[2022-03-09 08:09:40,970] {/app/app/views.py:48} app - DEBUG - creating and beginning database session...
+[2022-03-09 08:09:40,971] {/app/app/views.py:50} app - DEBUG - session created and started
+[2022-03-09 08:09:40,980] {/app/app/views.py:74} app - DEBUG - session closed
+[2022-03-09 08:09:40,981] {/app/app/views.py:76} app - DEBUG - True
+[2022-03-09 08:09:40,981] {/app/app/views.py:86} app - DEBUG - thomas.fredriksen@oceandata.earth does exist, signing in...
+[2022-03-09 08:09:40,981] {/app/app/views.py:87} app - DEBUG - User Data - ID: 5 | E-Mail: thomas.fredriksen@oceandata.earth | Username: tom
+[2022-03-09 08:09:40,982] {/app/app/views.py:100} app - DEBUG - sign in unsuccessful
+[2022-03-09 08:09:48,540] {/app/app/views.py:32} app - INFO - /signin loaded
+[2022-03-09 08:09:48,540] {/app/app/views.py:35} app - DEBUG - request method POST
+[2022-03-09 08:09:48,541] {/app/app/views.py:38} app - DEBUG - thomas.fredriksen@oceandata.earth login attempt...
+[2022-03-09 08:09:48,541] {/app/app/views.py:46} app - DEBUG - checking thomas.fredriksen@oceandata.earth
+[2022-03-09 08:09:48,542] {/app/app/views.py:48} app - DEBUG - creating and beginning database session...
+[2022-03-09 08:09:48,542] {/app/app/views.py:50} app - DEBUG - session created and started
+[2022-03-09 08:09:48,549] {/app/app/views.py:74} app - DEBUG - session closed
+[2022-03-09 08:09:48,549] {/app/app/views.py:76} app - DEBUG - True
+[2022-03-09 08:09:48,550] {/app/app/views.py:86} app - DEBUG - thomas.fredriksen@oceandata.earth does exist, signing in...
+[2022-03-09 08:09:48,550] {/app/app/views.py:87} app - DEBUG - User Data - ID: 5 | E-Mail: thomas.fredriksen@oceandata.earth | Username: tom
+[2022-03-09 08:09:48,550] {/app/app/views.py:98} app - DEBUG - sign in successfull

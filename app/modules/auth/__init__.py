@@ -1,0 +1,1 @@
+from .views import mod as auth_mod

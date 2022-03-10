@@ -20,7 +20,7 @@ class AESCipher:
         if key is not None:
             self.key = bytes(str(key), "utf-8")
         else:
-            self.key = bytes(str(os.environ["KEY"]), "utf-8")
+            self.key = bytes(str(os.environ["SECRET_KEY"]), "utf-8")
 
     def encrypt(self, raw):
         """

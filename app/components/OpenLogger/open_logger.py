@@ -14,11 +14,6 @@ def make_sure_path_exists(path):
             raise
 
 
-root_dir = os.path.normpath(os.getcwd() + os.sep)
-make_sure_path_exists(os.path.join(root_dir, "logs"))
-log_dir = os.path.join(root_dir, "logs")
-
-
 def create_handlers(log_fname=None, c_level=logging.INFO, f_level=logging.DEBUG):
 
     f_handler = None
@@ -50,8 +45,20 @@ def create_handlers(log_fname=None, c_level=logging.INFO, f_level=logging.DEBUG)
 
 
 def configure_logger(
-    logger, log_to_file=False, console_level=logging.INFO, file_level=logging.DEBUG
+    logger, log_to_file=False, log_dir_path=None, console_level=logging.INFO, file_level=logging.DEBUG
 ):
+
+    # Create log dir
+    root_dir = os.path.normpath(os.getcwd() + os.sep)
+    if log_dir_path is not None:
+        make_sure_path_exists(os.path.join(root_dir, log_dir_path))
+        root_log_dir = os.path.join(root_dir, log_dir_path)
+    else:
+        root_log_dir = root_dir
+    make_sure_path_exists(os.path.join(root_log_dir, "logs"))
+    log_dir = os.path.join(root_log_dir, "logs")
+
+
     now = datetime.now()
 
     logger.setLevel(logging.DEBUG)
