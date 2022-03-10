@@ -1,14 +1,17 @@
+# /app/__init__.py
+
 import os
 import logging
 
-from components.OpenLogger import configure_loggers
-from waitress import serve
 from flask import Flask
+from waitress import serve
+from prometheus_client import make_wsgi_app, Counter, Summary
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app
-from sqlalchemy import create_engine, inspect, sql
-from sqlalchemy.orm import sessionmaker
 
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, inspect
+
+from app.components.OpenLogger import configure_loggers
 
 def get_connection_url() -> str:
     """
@@ -30,7 +33,7 @@ def configure_logging():
     waitress_logger = logging.getLogger("waitress")
 
     configure_loggers(
-        [app_logger, flask_logger, sqlalchemy_logger, waitress_logger], log_to_file=True, log_dir_path="app"
+        [app_logger, flask_logger, sqlalchemy_logger, waitress_logger], log_to_file=True
     )
 
 
@@ -54,13 +57,20 @@ engine = create_engine(get_connection_url())
 insp = inspect(engine)
 Session = create_session(engine)
 
+view_metric = Counter("view", "Endpoint View", ["endpoint"])
+load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
+
+# Index Module
+from app.modules.index import index_mod
+app.register_blueprint(index_mod)
+
+# Auth Module
+from app.modules.auth import auth_mod
+app.register_blueprint(auth_mod)
+
 
 def serve_app(app):
     serve(app, host="0.0.0.0", port=os.environ["FLASK_PORT"], url_scheme="https")
-
-
-from app.modules.auth import auth_mod
-app.register_blueprint(auth_mod)
 
 
 if __name__ == "__name__":

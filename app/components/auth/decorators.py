@@ -16,7 +16,7 @@ def match_api_keys(key, ip):
     api_key = get_apiauth_object_by_key(key)
     if api_key is None:
         return False
-    elif api_key.ip == "0.0.0.0":   # 0.0.0.0 means all IPs.
+    elif api_key.ip == "0.0.0.0":  # 0.0.0.0 means all IPs.
         return True
     elif api_key.key == key and api_key.ip == ip:
         return True
@@ -31,10 +31,12 @@ def require_app_key(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if match_api_keys(request.args.get('key'), request.remote_addr):
+        if match_api_keys(request.args.get("key"), request.remote_addr):
             return f(*args, **kwargs)
         else:
-            app.logger.warning("Unauthorized address trying to use API: " + request.remote_addr)
+            app.logger.warning(
+                "Unauthorized address trying to use API: " + request.remote_addr
+            )
             abort(401)
 
     return decorated
@@ -42,19 +44,22 @@ def require_app_key(f):
 
 ## Test HTTP Basic auth
 
+
 def check_auth(username, password):
     """This function is called to check if a username /
     password combination is valid.
     """
-    return username == 'samskip' and password == 'owns'
+    return username == "samskip" and password == "owns"
 
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
     return Response(
-        'Could not verify your access level for that URL.\n'
-        'You have to login with proper credentials', 401,
-        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        "Could not verify your access level for that URL.\n"
+        "You have to login with proper credentials",
+        401,
+        {"WWW-Authenticate": 'Basic realm="Login Required"'},
+    )
 
 
 def requires_auth(f):

@@ -22,9 +22,15 @@ DeclerativeBase = declarative_base(metadata=meta)
 class Base(DeclerativeBase):
     __abstract__ = True
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True, unique=True)
-    date_created = sa.Column(sa.DateTime, default=sa.func.current_timestamp(), nullable=True)
-    date_modified = sa.Column(sa.DateTime, default=sa.func.current_timestamp(), onupdate=sa.func.current_timestamp())
-
+    date_created = sa.Column(
+        sa.DateTime, default=sa.func.current_timestamp(), nullable=True
+    )
+    date_modified = sa.Column(
+        sa.DateTime,
+        default=sa.func.current_timestamp(),
+        onupdate=sa.func.current_timestamp(),
+        nullable=True,
+    )
 
 
 class User(Base):
@@ -45,18 +51,15 @@ class User(Base):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
-                'iat': datetime.datetime.utcnow(),
-                'sub': user_id
+                "exp": datetime.datetime.utcnow()
+                + datetime.timedelta(days=0, seconds=5),
+                "iat": datetime.datetime.utcnow(),
+                "sub": user_id,
             }
-            return jwt.encode(
-                payload,
-                app.config.get('SECRET_KEY'),
-                algorithm='HS256'
-            )
+            return jwt.encode(payload, app.config.get("SECRET_KEY"), algorithm="HS256")
         except Exception as e:
             return e
-        
+
     @staticmethod
     def decode_auth_token(auth_token):
         """
@@ -65,12 +68,12 @@ class User(Base):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
-            return payload['sub']
+            payload = jwt.decode(auth_token, app.config.get("SECRET_KEY"))
+            return payload["sub"]
         except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
+            return "Signature expired. Please log in again."
         except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'
+            return "Invalid token. Please log in again."
 
 
 class Password(Base):
@@ -90,9 +93,8 @@ class UserToken(Base):
 
     user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), primary_key=True)
     token = sa.Column(sa.String(120), nullable=False, unique=True)
-    ip = sa.Column(sa.String(120), nullable=False, unique=False)
-    
+
     user = sa.orm.relationship("User", backref="user_tokens")
 
     def __repr__(self):
-        return "<UserToken %r>" % self.ip
+        return "<UserToken %r>" % self.token
