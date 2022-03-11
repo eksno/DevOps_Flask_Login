@@ -1,8 +1,10 @@
 """SQLAlchemy ORM models."""
 
+import os
 import jwt
 import sqlalchemy as sa
 from app import app
+from app.components.utils import exception_str
 from datetime import datetime, timedelta
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -21,15 +23,14 @@ DeclerativeBase = declarative_base(metadata=meta)
 
 class Base(DeclerativeBase):
     __abstract__ = True
-    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True, unique=True)
     date_created = sa.Column(
-        sa.DateTime, default=sa.func.current_timestamp(), nullable=True
+        sa.DateTime, default=sa.func.current_timestamp(), nullable=False
     )
     date_modified = sa.Column(
         sa.DateTime,
         default=sa.func.current_timestamp(),
         onupdate=sa.func.current_timestamp(),
-        nullable=True,
+        nullable=False,
     )
 
 
@@ -39,7 +40,7 @@ class User(Base):
     id = sa.Column(sa.Integer, autoincrement=True, primary_key=True, unique=True)
     email = sa.Column(sa.UnicodeText(), nullable=False, index=True, unique=True)
     username = sa.Column("username", sa.UnicodeText(), nullable=False)
-    admin = sa.Column(sa.Boolean, nullable=True, default=True)
+    admin = sa.Column(sa.Boolean, nullable=True, default=False)
 
     def __repr__(self):
         return "<User %r>" % self.email
@@ -51,12 +52,11 @@ class User(Base):
         """
         try:
             payload = {
-                "exp": datetime.datetime.utcnow()
-                + datetime.timedelta(days=0, seconds=5),
-                "iat": datetime.datetime.utcnow(),
+                "exp": datetime.utcnow() + timedelta(days=0, seconds=5),
+                "iat": datetime.utcnow(),
                 "sub": user_id,
             }
-            return jwt.encode(payload, app.config.get("SECRET_KEY"), algorithm="HS256")
+            return jwt.encode(payload, os.environ("SECRET_KEY"), algorithm="HS256")
         except Exception as e:
             return e
 
@@ -68,7 +68,7 @@ class User(Base):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, app.config.get("SECRET_KEY"))
+            payload = jwt.decode(auth_token, os.environ("SECRET_KEY"))
             return payload["sub"]
         except jwt.ExpiredSignatureError:
             return "Signature expired. Please log in again."

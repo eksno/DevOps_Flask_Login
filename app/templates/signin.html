@@ -13,13 +13,13 @@
     <div class="form-page">
         <h1>Sign In</h1>
         <div class="form">
-            <form class="signin-form" action="/signin" method="POST">
+            <form class="signin-form" action="/auth/signin" method="POST">
                 <input type="text" name="E-Mail" placeholder="E-Mail" />
                 <input type="password" name="Password" placeholder="Password" />
 
                 <button type="submit">Sign In</button>
 
-                <p class="message">{{ message }} <a href="/signup">Sign Up</a></p>
+                <p class="message">{{ message }} <a href="/auth/signup">Sign Up</a></p>
             </form>
         </div>
     </div>

@@ -1,8 +1,8 @@
 """Initial Migration
 
-Revision ID: 37598604bd58
+Revision ID: 4b52c2a28e9a
 Revises: 
-Create Date: 2022-01-21 09:44:20.933235
+Create Date: 2022-03-10 12:25:28.709504
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "37598604bd58"
+revision = "4b52c2a28e9a"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,28 +21,43 @@ def upgrade():
     op.create_table(
         "users",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("date_created", sa.DateTime(), nullable=False),
+        sa.Column("date_modified", sa.DateTime(), nullable=False),
         sa.Column("email", sa.UnicodeText(), nullable=False),
         sa.Column("username", sa.UnicodeText(), nullable=False),
+        sa.Column("admin", sa.Boolean(), nullable=True),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
+        sa.UniqueConstraint("id", name=op.f("uq_users_id")),
     )
     op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
     op.create_table(
         "passwords",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("date_created", sa.DateTime(), nullable=False),
+        sa.Column("date_modified", sa.DateTime(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("password", sa.UnicodeText(), nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"], ["users.id"], name=op.f("fk_passwords_user_id_users")
         ),
         sa.PrimaryKeyConstraint("user_id", name=op.f("pk_passwords")),
+        sa.UniqueConstraint("id", name=op.f("uq_passwords_id")),
     )
     op.create_table(
         "user_tokens",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("date_created", sa.DateTime(), nullable=False),
+        sa.Column("date_modified", sa.DateTime(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("user_token", sa.UnicodeText(), nullable=False),
+        sa.Column("token", sa.String(length=120), nullable=False),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], name=op.f("fk_user_tokens_user_id_users")
+            ["user_id"],
+            ["users.id"],
+            name=op.f("fk_user_tokens_user_id_users"),
         ),
         sa.PrimaryKeyConstraint("user_id", name=op.f("pk_user_tokens")),
+        sa.UniqueConstraint("id", name=op.f("uq_user_tokens_id")),
+        sa.UniqueConstraint("token", name=op.f("uq_user_tokens_token")),
     )
     # ### end Alembic commands ###
 

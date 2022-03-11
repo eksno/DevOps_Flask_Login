@@ -13,6 +13,7 @@ from sqlalchemy import create_engine, inspect
 
 from app.components.OpenLogger import configure_loggers
 
+
 def get_connection_url() -> str:
     """
     Get connection URL from environment variables
@@ -62,10 +63,12 @@ load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
 
 # Index Module
 from app.modules.index import index_mod
+
 app.register_blueprint(index_mod)
 
 # Auth Module
 from app.modules.auth import auth_mod
+
 app.register_blueprint(auth_mod)
 
 

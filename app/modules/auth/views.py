@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template
 
 from app import app, Session, view_metric
 from app.components import orm
+from app.components.utils import exception_str
 from app.components.cipher import AESCipher
 
 
@@ -17,74 +18,87 @@ def signin():
 
     if request.method == "POST":
         app.logger.debug("request method POST")
+        
+        # Get post data
         userdata = request.form
 
         app.logger.debug(userdata["E-Mail"] + " login attempt...")
 
-        # TODO: Add more bad data checks
-        if len(userdata) != 2:
-            app.logger.error("Data is bad")
-            # Data is bad, return error
-            return render_template("error.html", message="Bad Data")
+        try:
+            app.logger.debug("creating and beginning database session...")
+            with Session.begin() as session:
+                app.logger.debug("session created and started")
 
-        app.logger.debug("checking " + userdata["E-Mail"])
-
-        app.logger.debug("creating and beginning database session...")
-        with Session.begin() as session:
-            app.logger.debug("session created and started")
-            user = (
-                session.query(orm.User)
-                .filter(orm.User.email == userdata["E-Mail"])
-                .all()
-            )
-
-            exists = len(user) is not 0
-
-            if exists:
-                user = {
-                    "id": int(user[0].id),
-                    "email": str(user[0].email),
-                    "username": str(user[0].username),
-                }
-
-                encrypted_password = (
-                    session.query(orm.Password)
-                    .filter(orm.Password.user_id == user["id"])
+                # Get user data
+                user = (
+                    session.query(orm.User)
+                    .filter(orm.User.email == userdata["E-Mail"])
                     .all()
                 )
 
-                encrypted_password = str(encrypted_password[0].password)
+                exists = len(user) is not 0
 
-        app.logger.debug("session closed")
 
-        app.logger.debug(exists)
+                if exists:
+                    # User exists
+                    user = user[0]
 
-        if not exists:
-            app.logger.debug(userdata["E-Mail"] + " does not exist.")
-            # User does not exist
-            return render_template(
-                "signin.html", message="User does not exist."
-            )  # TODO: Give a better message telling the person the user already exists
+                    user_dict = {
+                        "id": int(user.id),
+                        "email": str(user.email),
+                        "username": str(user.username),
+                    }
 
-        # User exists
-        app.logger.debug(userdata["E-Mail"] + " does exist, signing in...")
-        app.logger.debug(
-            "User Data - ID: "
-            + str(user["id"])
-            + " | E-Mail: "
-            + user["email"]
-            + " | Username: "
-            + user["username"]
-        )
+                    encrypted_password = (
+                        session.query(orm.Password)
+                        .filter(orm.Password.user_id == user_dict["id"])
+                        .all()
+                    )
 
-        if userdata["Password"] == cipher.decrypt(encrypted_password):
-            app.logger.debug("sign in successfull")
-            return render_template("signed_in.html", email=userdata["E-Mail"])
-        app.logger.debug("sign in unsuccessful")
+                    encrypted_password = str(encrypted_password[0].password)
+                    
+                    app.logger.debug(userdata["E-Mail"] + " - exists, attempting to sign in...")
+                    app.logger.debug(
+                        "User Data - ID: "
+                        + str(user_dict["id"])
+                        + " | E-Mail: "
+                        + user_dict["email"]
+                        + " | Username: "
+                        + user_dict["username"]
+                    )
 
-        return render_template(
-            "signin.html", message="Wrong password or e-mail."
-        )  # TODO: Give a better message telling the person the user already exists
+                    if userdata["Password"] == cipher.decrypt(encrypted_password):
+                        # Signin successfull
+                        app.logger.debug(userdata["E-Mail"] + " - correct password")
+
+                        app.logger.debug(userdata["E-Mail"] + " - creating auth token...")
+                        auth_token = user.encode_auth_token(user.id)
+                        if auth_token and not isinstance(auth_token, Exception):
+                            app.logger.debug("auth token created, redirecting... - " + auth_token)
+                            return render_template("signed_in.html", email=userdata["E-Mail"], user_token=auth_token)
+                        else:
+                            app.logger.exception("signin failed" + exception_str(auth_token))
+                            return render_template("error.html", error=exception_str(auth_token))
+                    else:
+                        # Signin unsuccessfull
+                        app.logger.debug(userdata["E-Mail"] + " - wrong password")
+
+                        return render_template(
+                            "signin.html", message="Wrong password or e-mail."
+                        )  # TODO: Give a better message telling the person the user already exists
+                else:
+                    app.logger.debug(userdata["E-Mail"] + " does not exist.")
+                    # User does not exist
+                    return render_template(
+                        "signin.html", message="User does not exist."
+                    )  # TODO: Give a better message telling the person the user already exists
+        except Exception as e:
+            app.logger.error("Signin by " + userdata["E-Mail"] + " failed. Traceback - " + exception_str(e))
+            return render_template("error.html", error="Signin has failed: " + exception_str(e))
+        finally:
+            app.logger.debug("signin finished")
+
+
 
     app.logger.debug("default operation")
     # Default operation
@@ -106,16 +120,16 @@ def signup():
         if len(userdata) != 3:
             app.logger.error("Data is bad")
             # Data is bad, return error
-            return render_template("error.html", message="Bad Data")
+            return render_template("error.html", error="Bad Data")
 
         # Add user
 
         encrypted_password = cipher.encrypt(userdata["Password"])
-        user_token = cipher.encrypt("123user_token")
+        encrypted_token = cipher.encrypt("123user_token")
 
         new_user = orm.User(email=userdata["E-Mail"], username=userdata["Username"])
         new_password = orm.Password(password=encrypted_password, user=new_user)
-        new_user_token = orm.UserToken(user_token=user_token, user=new_user)
+        new_user_token = orm.UserToken(token=encrypted_token, user=new_user)
 
         app.logger.debug("creating and beginning database session...")
         with Session.begin() as session:
