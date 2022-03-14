@@ -74,7 +74,9 @@ def signin():
                         app.logger.debug(userdata["E-Mail"] + " - creating auth token...")
                         auth_token = user.encode_auth_token(user.id)
                         if auth_token and not isinstance(auth_token, Exception):
-                            app.logger.debug("auth token created, redirecting... - " + auth_token)
+                            app.logger.debug("auth token created, saving in database... - " + auth_token)
+
+
                             return render_template("signed_in.html", email=userdata["E-Mail"], user_token=auth_token)
                         else:
                             app.logger.exception("signin failed" + exception_str(auth_token))

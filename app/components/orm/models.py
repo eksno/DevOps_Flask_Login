@@ -52,11 +52,11 @@ class User(Base):
         """
         try:
             payload = {
-                "exp": datetime.utcnow() + timedelta(days=0, seconds=5),
+                "exp": datetime.utcnow() + timedelta(days=0, minutes=5),
                 "iat": datetime.utcnow(),
                 "sub": user_id,
             }
-            return jwt.encode(payload, os.environ("SECRET_KEY"), algorithm="HS256")
+            return jwt.encode(payload, os.environ["SECRET_KEY"], algorithm="HS256")
         except Exception as e:
             return e
 
@@ -68,12 +68,12 @@ class User(Base):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, os.environ("SECRET_KEY"))
+            payload = jwt.decode(auth_token, os.environ["SECRET_KEY"])
             return payload["sub"]
         except jwt.ExpiredSignatureError:
-            return "Signature expired. Please log in again."
+            return "Token expired. Please create a new token."
         except jwt.InvalidTokenError:
-            return "Invalid token. Please log in again."
+            return "Invalid token. Please create a new token."
 
 
 class Password(Base):
