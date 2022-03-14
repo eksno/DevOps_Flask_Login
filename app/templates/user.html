@@ -11,14 +11,9 @@
 
 <body>
     <div class="form-page">
-        <h1>You have not signed in.</h1>
+        <h1>Signed in as {{ email }}</h1>
         <div class="form">
-            <a href="/auth/signup">
-                <button type="button">Sign Up</button>
-            </a>
-            <a href="/auth/signin">
-                <button type="button">Sign In</button>
-            </a>
+            <p>AuthToken: {{ auth_token }}</p>
         </div>
     </div>
 </body>

@@ -42,6 +42,7 @@ def create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = get_connection_url()
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
+    app.secret_key = os.environ["SECRET_KEY"]
 
     configure_logging()
     return app
@@ -61,6 +62,9 @@ Session = create_session(engine)
 view_metric = Counter("view", "Endpoint View", ["endpoint"])
 load_duration_metric = Summary("load_duration", "Time spent loading sql pages")
 
+
+""" Modules """
+
 # Index Module
 from app.modules.index import index_mod
 
@@ -70,6 +74,16 @@ app.register_blueprint(index_mod)
 from app.modules.auth import auth_mod
 
 app.register_blueprint(auth_mod)
+
+# User Module
+from app.modules.user import user_mod
+
+app.register_blueprint(user_mod)
+
+# API Module
+from app.modules.api import api_mod
+
+app.register_blueprint(api_mod)
 
 
 def serve_app(app):
