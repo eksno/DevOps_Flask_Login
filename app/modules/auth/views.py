@@ -1,8 +1,8 @@
 from flask import Blueprint, redirect, request, render_template, url_for, session as user_session
 
-from app import app, Session, view_metric
+from app import app, Session
 from app.components import orm
-from app.components.utils import exception_str, encrypt_user_dict
+from app.components.utils import apply_metrics, exception_str, encrypt_user_dict
 from app.components.cipher import AESCipher
 
 
@@ -11,11 +11,9 @@ mod = Blueprint("auth", __name__, url_prefix="/auth")
 cipher = AESCipher()
 
 
+@apply_metrics(endpoint="/auth/signin")
 @mod.route("/signin", methods=["POST", "GET"])
 def signin():
-    view_metric.labels(endpoint="/signin").inc()
-    app.logger.info("/signin loaded")
-
     if request.method == "POST":
         app.logger.debug("request method POST")
         
@@ -101,11 +99,9 @@ def signin():
     return render_template("signin.html", message="Haven't signed up yet?")
 
 
+@apply_metrics(endpoint="/auth/signup")
 @mod.route("/signup", methods=["POST", "GET"])
 def signup():
-    view_metric.labels(endpoint="/signup").inc()
-    app.logger.info("/signup loaded")
-
     if request.method == "POST":
         app.logger.debug("request method POST")
         userdata = request.form

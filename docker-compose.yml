@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 
 volumes:
     prometheus_data: {}
@@ -9,7 +9,7 @@ networks:
   back-tier:
 
 services:
-  db_exporter:
+  db-exporter:
     image:  quay.io/prometheuscommunity/postgres-exporter
     networks:
       - back-tier
@@ -17,6 +17,7 @@ services:
       - 9187:9187
     env_file:
       - .env
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
@@ -34,7 +35,7 @@ services:
       - alertmanager:alertmanager
     networks:
       - back-tier
-    restart: always
+    restart: unless-stopped
 
   alertmanager:
     image: prom/alertmanager
@@ -44,10 +45,10 @@ services:
       - ./alertmanager/:/etc/alertmanager/
     networks:
       - back-tier
-    restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
+    restart: unless-stopped
   
   grafana:
     image: grafana/grafana
@@ -64,18 +65,19 @@ services:
     networks:
       - back-tier
       - front-tier
-    restart: always
+    restart: unless-stopped
 
   db:
-    image: postgres:13
+    image: postgres:latest
     ports:
       - 5432:5432
     env_file:
       - .env
     volumes:
-      - ./data/db/:/app/data/db
+      - ./db_data/:/var/lib/postgresql/data
     networks:
       - back-tier
+    restart: unless-stopped
 
   app:
     build: .
@@ -84,7 +86,8 @@ services:
     volumes:
       - .:/app
     ports:
-      - "${FLASK_PORT}:${FLASK_PORT}"
+      - "8080:8080"
+      - "80:80"
     depends_on:
       - db
     env_file:
@@ -92,3 +95,4 @@ services:
     networks:
       - back-tier
       - front-tier
+    restart: unless-stopped

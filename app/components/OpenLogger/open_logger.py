@@ -59,15 +59,19 @@ def configure_logger(
     logger.setLevel(logging.DEBUG)
 
     if log_to_file:
-        # Create Handlers
+        # Create path
         make_sure_path_exists(os.path.join(log_dir, now.strftime("%Y")))
         log_year_dir = os.path.join(log_dir, now.strftime("%Y"))
         make_sure_path_exists(os.path.join(log_year_dir, now.strftime("%B")))
         log_month_dir = os.path.join(log_year_dir, now.strftime("%B"))
+        make_sure_path_exists(os.path.join(log_month_dir, now.strftime("%d")))
+        log_day_dir = os.path.join(log_month_dir, now.strftime("%d"))
+
         log_fname = os.path.join(
-            log_month_dir, "{}.log".format(now.strftime("%b-%d-%Y_%H-%M-%S"))
+            log_day_dir, "{}.log".format(now.strftime("%b-%d-%Y_%H-%M-%S"))
         )
 
+        # Create Handlers
         c_handler, f_handler = create_handlers(log_fname)
         logger.addHandler(c_handler)
         logger.addHandler(f_handler)

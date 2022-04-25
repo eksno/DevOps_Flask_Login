@@ -1,0 +1,712 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: alertmanager
+      name: alertmanager
+    spec:
+      ports:
+        - name: "9093"
+          port: 9093
+          targetPort: 9093
+      selector:
+        io.kompose.service: alertmanager
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app
+      name: app
+    spec:
+      ports:
+        - name: "8080"
+          port: 8080
+          targetPort: 8080
+        - name: "80"
+          port: 80
+          targetPort: 80
+      selector:
+        io.kompose.service: app
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db
+      name: db
+    spec:
+      ports:
+        - name: "5432"
+          port: 5432
+          targetPort: 5432
+      selector:
+        io.kompose.service: db
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db-exporter
+      name: db-exporter
+    spec:
+      ports:
+        - name: "9187"
+          port: 9187
+          targetPort: 9187
+      selector:
+        io.kompose.service: db-exporter
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+      name: grafana
+    spec:
+      ports:
+        - name: "3000"
+          port: 3000
+          targetPort: 3000
+      selector:
+        io.kompose.service: grafana
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: prometheus
+      name: prometheus
+    spec:
+      ports:
+        - name: "9090"
+          port: 9090
+          targetPort: 9090
+      selector:
+        io.kompose.service: prometheus
+    status:
+      loadBalancer: {}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: alertmanager
+      name: alertmanager
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: alertmanager
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.service: alertmanager
+        spec:
+          containers:
+            - args:
+                - --config.file=/etc/alertmanager/config.yml
+                - --storage.path=/alertmanager
+              image: prom/alertmanager
+              name: alertmanager
+              ports:
+                - containerPort: 9093
+              resources: {}
+              volumeMounts:
+                - mountPath: /etc/alertmanager/
+                  name: alertmanager-claim0
+          restartPolicy: Always
+          volumes:
+            - name: alertmanager-claim0
+              persistentVolumeClaim:
+                claimName: alertmanager-claim0
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: alertmanager-claim0
+      name: alertmanager-claim0
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      creationTimestamp: null
+      name: back-tier
+    spec:
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  io.kompose.network/back-tier: "true"
+      podSelector:
+        matchLabels:
+          io.kompose.network/back-tier: "true"
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app
+      name: app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: app
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.network/front-tier: "true"
+            io.kompose.service: app
+        spec:
+          containers:
+            - command:
+                - bash
+                - -c
+                - ./scripts/app-setup.sh
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATABASE_URL
+                      name: env
+                - name: DATA_SOURCE_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATA_SOURCE_NAME
+                      name: env
+                - name: FLASK_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: FLASK_PORT
+                      name: env
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DB
+                      name: env
+                - name: POSTGRES_DBNAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DBNAME
+                      name: env
+                - name: POSTGRES_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_HOST
+                      name: env
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PASSWORD
+                      name: env
+                - name: POSTGRES_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PORT
+                      name: env
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_USER
+                      name: env
+                - name: SECRET_KEY
+                  valueFrom:
+                    configMapKeyRef:
+                      key: SECRET_KEY
+                      name: env
+              image: app
+              imagePullPolicy: Never
+              name: app
+              ports:
+                - containerPort: 8080
+                - containerPort: 80
+              resources: {}
+              volumeMounts:
+                - mountPath: /app
+                  name: app-claim0
+          restartPolicy: Always
+          volumes:
+            - name: app-claim0
+              persistentVolumeClaim:
+                claimName: app-claim0
+    status: {}
+  - apiVersion: v1
+    data:
+      DATA_SOURCE_NAME: postgresql://postgres:postgres@db:5432/postgres?sslmode=disable
+      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+      FLASK_PORT: "80"
+      POSTGRES_DB: postgres
+      POSTGRES_DBNAME: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: postgres
+      SECRET_KEY: 41035e0a7a3e680706caba8f5d4165ed
+    kind: ConfigMap
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app-env
+      name: env
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app-claim0
+      name: app-claim0
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      creationTimestamp: null
+      name: front-tier
+    spec:
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  io.kompose.network/front-tier: "true"
+      podSelector:
+        matchLabels:
+          io.kompose.network/front-tier: "true"
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db
+      name: db
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: db
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.service: db
+        spec:
+          containers:
+            - env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATABASE_URL
+                      name: env
+                - name: DATA_SOURCE_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATA_SOURCE_NAME
+                      name: env
+                - name: FLASK_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: FLASK_PORT
+                      name: env
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DB
+                      name: env
+                - name: POSTGRES_DBNAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DBNAME
+                      name: env
+                - name: POSTGRES_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_HOST
+                      name: env
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PASSWORD
+                      name: env
+                - name: POSTGRES_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PORT
+                      name: env
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_USER
+                      name: env
+                - name: SECRET_KEY
+                  valueFrom:
+                    configMapKeyRef:
+                      key: SECRET_KEY
+                      name: env
+              image: postgres:latest
+              name: db
+              ports:
+                - containerPort: 5432
+              resources: {}
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: db-claim0
+          restartPolicy: Always
+          volumes:
+            - name: db-claim0
+              persistentVolumeClaim:
+                claimName: db-claim0
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db-claim0
+      name: db-claim0
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db-exporter
+      name: db-exporter
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: db-exporter
+      strategy: {}
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.service: db-exporter
+        spec:
+          containers:
+            - env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATABASE_URL
+                      name: env
+                - name: DATA_SOURCE_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DATA_SOURCE_NAME
+                      name: env
+                - name: FLASK_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: FLASK_PORT
+                      name: env
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DB
+                      name: env
+                - name: POSTGRES_DBNAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DBNAME
+                      name: env
+                - name: POSTGRES_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_HOST
+                      name: env
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PASSWORD
+                      name: env
+                - name: POSTGRES_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PORT
+                      name: env
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_USER
+                      name: env
+                - name: SECRET_KEY
+                  valueFrom:
+                    configMapKeyRef:
+                      key: SECRET_KEY
+                      name: env
+              image: quay.io/prometheuscommunity/postgres-exporter
+              name: db-exporter
+              ports:
+                - containerPort: 9187
+              resources: {}
+          restartPolicy: Always
+    status: {}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+      name: grafana
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: grafana
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.network/front-tier: "true"
+            io.kompose.service: grafana
+        spec:
+          containers:
+            - env:
+                - name: GF_SECURITY_ADMIN_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GF_SECURITY_ADMIN_PASSWORD
+                      name: grafana-config-monitoring
+                - name: GF_USERS_ALLOW_SIGN_UP
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GF_USERS_ALLOW_SIGN_UP
+                      name: grafana-config-monitoring
+              image: grafana/grafana
+              name: grafana
+              ports:
+                - containerPort: 3000
+              resources: {}
+              securityContext:
+                runAsUser: 472
+              volumeMounts:
+                - mountPath: /var/lib/grafana
+                  name: grafana-data
+                - mountPath: /etc/grafana/provisioning/
+                  name: grafana-claim1
+          restartPolicy: Always
+          volumes:
+            - name: grafana-data
+              persistentVolumeClaim:
+                claimName: grafana-data
+            - name: grafana-claim1
+              persistentVolumeClaim:
+                claimName: grafana-claim1
+    status: {}
+  - apiVersion: v1
+    data:
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    kind: ConfigMap
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana-grafana-config-monitoring
+      name: grafana-config-monitoring
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana-data
+      name: grafana-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana-claim1
+      name: grafana-claim1
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: prometheus
+      name: prometheus
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: prometheus
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml -o kubemanifest.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/back-tier: "true"
+            io.kompose.service: prometheus
+        spec:
+          containers:
+            - args:
+                - --config.file=/etc/prometheus/prometheus.yml
+                - --storage.tsdb.path=/prometheus
+                - --web.console.libraries=/usr/share/prometheus/console_libraries
+                - --web.console.templates=/usr/share/prometheus/consoles
+              image: prom/prometheus:latest
+              name: prometheus
+              ports:
+                - containerPort: 9090
+              resources: {}
+              volumeMounts:
+                - mountPath: /etc/prometheus/
+                  name: prometheus-claim0
+                - mountPath: /prometheus
+                  name: prometheus-data
+          restartPolicy: Always
+          volumes:
+            - name: prometheus-claim0
+              persistentVolumeClaim:
+                claimName: prometheus-claim0
+            - name: prometheus-data
+              persistentVolumeClaim:
+                claimName: prometheus-data
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: prometheus-claim0
+      name: prometheus-claim0
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: prometheus-data
+      name: prometheus-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+kind: List
+metadata: {}
+

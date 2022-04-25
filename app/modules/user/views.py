@@ -2,7 +2,7 @@ from flask import Blueprint, session as user_session, render_template, redirect,
 
 from app import app, Session, view_metric
 from app.components import orm
-from app.components.utils import exception_str, get_signed_in
+from app.components.utils import exception_str, get_user, apply_metrics
 from app.components.cipher import AESCipher
 
 
@@ -10,8 +10,9 @@ mod = Blueprint("user", __name__, url_prefix="/user")
 
 cipher = AESCipher()
 
+@apply_metrics(endpoint="/user/")
 @mod.route("/")
-@get_signed_in
+@get_user
 def index(user):
     if user is False:
         return redirect(url_for("auth.signin"))

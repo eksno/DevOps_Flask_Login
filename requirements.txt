@@ -7,3 +7,4 @@ alembic
 pycryptodome
 pyjwt
 cryptography
+marshmallow-sqlalchemy

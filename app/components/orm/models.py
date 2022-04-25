@@ -68,12 +68,13 @@ class User(Base):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, os.environ["SECRET_KEY"])
+            payload = jwt.decode(auth_token, os.environ["SECRET_KEY"], algorithms="HS256")
             return payload["sub"]
         except jwt.ExpiredSignatureError:
-            return "Token expired. Please create a new token."
-        except jwt.InvalidTokenError:
-            return "Invalid token. Please create a new token."
+            return "expired"
+        except jwt.InvalidTokenError as e:
+            app.logger.error("Invalid Token Error: " + exception_str(e))
+            return "invalid"
 
 
 class Password(Base):
