@@ -128,8 +128,12 @@ def get_user(func):
     
     def logic(*args, **kwargs):
         with Session.begin() as session:
-            # Get user dict
-            user_dict = decrypt_user_dict(user_session["user"])
+            try:
+                # Get user dict
+                user_dict = decrypt_user_dict(user_session["user"])
+            except KeyError:
+                # Cookie not created
+                return func(False, *args, **kwargs)
 
             # Get user data
             user = (
